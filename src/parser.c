@@ -46,21 +46,21 @@ PARSER_TREE *parser_tree_prev       = NULL;
  */
 int insert_parser_tree(char *str)
 {
-    // パーサーツリーの新規登録
-    if(parser_tree_top == NULL){
-        parser_tree_top     = (PARSER_TREE *)malloc(sizeof(PARSER_TREE));
-        parser_tree_current = parser_tree_top;
-    }else{
-        parser_tree_current->next_ptr   = (PARSER_TREE *)malloc(sizeof(PARSER_TREE));
-        parser_tree_prev                = parser_tree_current;
-        parser_tree_current             = parser_tree_current->next_ptr;
-        parser_tree_current->prev_ptr   = parser_tree_prev;
-        parser_tree_current->next_ptr   = NULL;
-    }
+  // パーサーツリーの新規登録
+  if(parser_tree_top == NULL){
+    parser_tree_top     = (PARSER_TREE *)malloc(sizeof(PARSER_TREE));
+    parser_tree_current = parser_tree_top;
+  }else{
+    parser_tree_current->next_ptr   = (PARSER_TREE *)malloc(sizeof(PARSER_TREE));
+    parser_tree_prev                = parser_tree_current;
+    parser_tree_current             = parser_tree_current->next_ptr;
+    parser_tree_current->prev_ptr   = parser_tree_prev;
+    parser_tree_current->next_ptr   = NULL;
+  }
 
-    // パーサーツリーに文字列の登録
+  // パーサーツリーに文字列の登録
   parser_tree_current->str = charalloc(str);
-    return 0;
+  return 0;
 }
 
 /*!
@@ -68,7 +68,7 @@ int insert_parser_tree(char *str)
  */
 PARSER_TREE * get_parser_tree_current()
 {
-    return parser_tree_current;
+  return parser_tree_current;
 }
 
 /*!
@@ -76,8 +76,8 @@ PARSER_TREE * get_parser_tree_current()
  */
 int parser_tree_current_top()
 {
-    parser_tree_current = parser_tree_top;
-    return 0;
+  parser_tree_current = parser_tree_top;
+  return 0;
 }
 
 /*!
@@ -88,15 +88,15 @@ int create_proc_source()
 //    PARSER_TREE *now_parser_tree;
 //    PARSER_TREE *parser_tree_process;
 //    unsigned int now_level;
-    char *token;
-    char *line;
-    int func_num = 0;
+  char *token;
+  char *line;
+  int func_num = 0;
   char *filename;
   FILE *fp;
   int size;
   char *const_header = "#include \"__extern.h\"\n\n\0";
 
-    printf(" -> Create Process Source\n");
+  printf(" -> Create Process Source\n");
   
   token = calloc(STR_MAX, 1);
   line = calloc(STR_MAX, 1);
@@ -104,9 +104,9 @@ int create_proc_source()
   filename = (char *)malloc(128);
   memset(filename, 0, 128);
 
-    parser_tree_current = parser_tree_top;
-    while(parser_tree_current != NULL){
-        if(parser_tree_current->flag == PARSER_FLAG_PROCESS){
+  parser_tree_current = parser_tree_top;
+  while(parser_tree_current != NULL){
+    if(parser_tree_current->flag == PARSER_FLAG_PROCESS){
       sprintf(filename, "__%03d.c", func_num);
       func_num++;
       fp = fopen(filename, "wb+");
@@ -117,16 +117,15 @@ int create_proc_source()
       fwrite(const_header, 1, strlen(const_header), fp);
       fwrite(parser_tree_current->line.body, 1, size, fp);
       fclose(fp);
-        }
-        parser_tree_current = parser_tree_current->next_ptr;
     }
+    parser_tree_current = parser_tree_current->next_ptr;
+  }
 
   free(token);
   free(line);
-
   free(filename);
 
-    return func_num;
+  return func_num;
 }
 
 /*!
@@ -137,11 +136,11 @@ int create_header_source()
 //    PARSER_TREE *now_parser_tree;
 //    PARSER_TREE *parser_tree_process;
 //    unsigned int now_level;
-    char *token;
-    char *line;
-    int m;
-    FILE *fp;
-    int size, start;
+  char *token;
+  char *line;
+  int m;
+  FILE *fp;
+  int size, start;
 //    char *filename;
   char *const_extern = "extern \0";
   char *const_define = "#define \0";
@@ -152,7 +151,7 @@ int create_header_source()
 
   char *const_grmem_func = "void __gr_mem(){\n";
 
-    printf(" -> Create Header Source\n");
+  printf(" -> Create Header Source\n");
 
   token = calloc(STR_MAX, 1);
 
@@ -161,15 +160,15 @@ int create_header_source()
    */
   fp = fopen(const_extern_c, "wb+");
   fwrite(const_grmem_func, 1, strlen(const_grmem_func), fp);
-    parser_tree_current = parser_tree_top;
-    while(parser_tree_current != NULL){
-        if(parser_tree_current->flag == PARSER_FLAG_LINE){
+  parser_tree_current = parser_tree_top;
+  while(parser_tree_current != NULL){
+    if(parser_tree_current->flag == PARSER_FLAG_LINE){
       size = strlen(parser_tree_current->line.body);
       fwrite(parser_tree_current->line.body, 1, size, fp);
       fwrite("\n\n", 1, 2, fp);
-        }
-        parser_tree_current = parser_tree_current->next_ptr;
     }
+    parser_tree_current = parser_tree_current->next_ptr;
+  }
   fwrite("}\n", 1, 2, fp);
   fclose(fp);
 
@@ -177,13 +176,13 @@ int create_header_source()
    * externヘッダファイルの生成
    */
   fp = fopen(const_extern_h, "wb+");
-    parser_tree_current = parser_tree_top;
+  parser_tree_current = parser_tree_top;
 
   /*
    * デファイン文
    */
-    while(parser_tree_current != NULL){
-        if(parser_tree_current->flag == PARSER_FLAG_DEFINE){
+  while(parser_tree_current != NULL){
+    if(parser_tree_current->flag == PARSER_FLAG_DEFINE){
       fwrite(const_define, 1, strlen(const_define), fp);
       size = strlen(parser_tree_current->define.name);
       fwrite(parser_tree_current->define.name, 1, size, fp);
@@ -193,15 +192,15 @@ int create_header_source()
       fwrite(const_space, 1, strlen(const_space), fp);
       fwrite("\n", 1, 1, fp);
     }
-        parser_tree_current = parser_tree_current->next_ptr;
+    parser_tree_current = parser_tree_current->next_ptr;
   }
 
   /*
    * グローバル変数
    */
-    parser_tree_current = parser_tree_top;
-    while(parser_tree_current != NULL){
-        if(parser_tree_current->flag == PARSER_FLAG_LINE){
+  parser_tree_current = parser_tree_top;
+  while(parser_tree_current != NULL){
+    if(parser_tree_current->flag == PARSER_FLAG_LINE){
       // 予約語から
       m++;
 
@@ -244,17 +243,17 @@ int create_header_source()
       fwrite("\n\n", 1, 2, fp);
 
       free(line);
-        }
-        parser_tree_current = parser_tree_current->next_ptr;
     }
+    parser_tree_current = parser_tree_current->next_ptr;
+  }
 
   /*
    * extern関数定義
    */
-    parser_tree_current = parser_tree_top;
+  parser_tree_current = parser_tree_top;
 
-    while(parser_tree_current != NULL){
-        if(parser_tree_current->flag == PARSER_FLAG_PROCESS){
+  while(parser_tree_current != NULL){
+    if(parser_tree_current->flag == PARSER_FLAG_PROCESS){
       // 予約語から
       m++;
 
@@ -292,15 +291,15 @@ int create_header_source()
       fwrite("\n\n", 1, 2, fp);
 
       free(line);
-        }
-        parser_tree_current = parser_tree_current->next_ptr;
     }
+    parser_tree_current = parser_tree_current->next_ptr;
+  }
 
   fclose(fp);
 
   free(token);
 
-    return 0;
+  return 0;
 }
 
 /*!
@@ -308,99 +307,96 @@ int create_header_source()
  */
 int parser_c_source()
 {
-    char *token;
-    TOKEN_ORDER *token_order_now, *token_order_next;
+  char *token;
+  TOKEN_ORDER *token_order_now, *token_order_next;
 //    PARSER_TREE *now_parser_tree;
-    int level = 0;
-    int procvalid = 0;
+  int level = 0;
+  int procvalid = 0;
 //    int iflevel = 0;
-    int i, max, leng;
+  int i, max, leng;
 
   token = calloc(STR_MAX, 1);
 
-    parser_level ++;
+  parser_level ++;
 
-    printf(" -> Parser for C Source\n");
+  printf(" -> Parser for C Source\n");
 
-    while(!read_token(token)){
-        insert_parser_tree(token);
-        if(!strcmp(token,"#")){
-            // 宣言文の処理
-            // 宣言文には以下のものがある
-            //  #define     : 定義宣言
-            //  #include    : インクルードファイル宣言
-            read_token(token);
-            if(!strcmp(token,"define")){
-                // #defineの取得
-                // #defineは基本的に取得しない
-                // 一行を読み込む
-                parser_tree_current->flag = PARSER_FLAG_DEFINE;
-                parser_tree_current->level = parser_level;
+  while(!read_token(token)){
+    insert_parser_tree(token);
+    if(!strcmp(token,"#")){
+      // 宣言文の処理
+      // 宣言文には以下のものがある
+      //  #define     : 定義宣言
+      //  #include    : インクルードファイル宣言
+      read_token(token);
+      if(!strcmp(token,"define")){
+        // #defineの取得
+        // #defineは基本的に取得しない
+        // 一行を読み込む
+        parser_tree_current->flag = PARSER_FLAG_DEFINE;
+        parser_tree_current->level = parser_level;
         read_token(token);
-                strcat(parser_tree_current->define.name,token);
-                while(strcmp(token,"\n")){
+        strcat(parser_tree_current->define.name,token);
+        while(strcmp(token,"\n")){
           read_token(token);
           strcat(parser_tree_current->define.value,token);
         }
-            }else if(!strcmp(token,"include")){
-                // #includeの取得
-                // #inculdeの場合、標準ヘッダやシステムで提供されているヘッダは読み込まず、ユーザー定義のインクルードファイルのみ読み込む
-                read_token(token);
-                if(!strcmp(token,"<")){
-                    // 標準インクルード・ヘッダ
-                    parser_tree_current->flag = PARSER_FLAG_INCLUDE_SYS;
-                    parser_tree_current->level = parser_level;
-                    do{
-                        read_token(token);
-                        if(strcmp(token,">")){
-                            strcat(parser_tree_current->include.filename,token);
-                        }
-                    }while(strcmp(token,">"));
-                }else{
-                    // ユーザー・インクルード・ヘッダ
-                    // ユーザー・インクルード・ヘッダはソースの一部として抜き出し、追加する
-                    parser_tree_current->flag   = PARSER_FLAG_INCLUDE_USER;
-                    parser_tree_current->level  = parser_level;
-                    strcat(parser_tree_current->include.filename, token);
+      }else if(!strcmp(token,"include")){
+        // #includeの取得
+        // #inculdeの場合、標準ヘッダやシステムで提供されているヘッダは読み込まず、ユーザー定義のインクルードファイルのみ読み込む
+        read_token(token);
+        if(!strcmp(token,"<")){
+          // 標準インクルード・ヘッダ
+          parser_tree_current->flag = PARSER_FLAG_INCLUDE_SYS;
+          parser_tree_current->level = parser_level;
+          do{
+            read_token(token);
+            if(strcmp(token,">")){
+              strcat(parser_tree_current->include.filename,token);
+            }
+          }while(strcmp(token,">"));
+        }else{
+          // ユーザー・インクルード・ヘッダ
+          // ユーザー・インクルード・ヘッダはソースの一部として抜き出し、追加する
+          parser_tree_current->flag   = PARSER_FLAG_INCLUDE_USER;
+          parser_tree_current->level  = parser_level;
+          strcat(parser_tree_current->include.filename, token);
 
-                    //
-                    max = strlen(token);
-                    for(i=1;i<max-1;i++){
-                        token[i-1] = token[i];
-                    }
-                    token[i-1] = 0x00;
+          max = strlen(token);
+          for(i=1;i<max-1;i++){
+            token[i-1] = token[i];
+          }
+          token[i-1] = 0x00;
 //                    printf(" - include file: %s\n",token);
 
-                    token_order_now     = get_token_order_prev();
-                    token_order_next    = get_token_order_current();
-                    set_token_order_current(token_order_now);
-                    // ユーザー・インクルード・ヘッダの読み込み
-                    read_file(token);
-                    set_token_order_current_next(token_order_next);
-                    set_token_order_current(token_order_now->next_ptr);
-                }
-            }
+          token_order_now     = get_token_order_prev();
+          token_order_next    = get_token_order_current();
+          set_token_order_current(token_order_now);
+          // ユーザー・インクルード・ヘッダの読み込み
+          read_file(token);
+          set_token_order_current_next(token_order_next);
+          set_token_order_current(token_order_now->next_ptr);
         }
-    else if((level == 0) && !strcmp(token,"\n")){
+      }
+    }else if((level == 0) && !strcmp(token,"\n")){
       // 行頭で改行コードなら無視する
-    }
-        else{
+    }else{
       // この時点でフラグは確定しない
-            parser_tree_current->flag = PARSER_FLAG_NOP;
-            parser_tree_current->level = parser_level;
+       parser_tree_current->flag = PARSER_FLAG_NOP;
+       parser_tree_current->level = parser_level;
 //            leng = strlen(token) + 1;
-            parser_tree_current->line.body = charalloc(token);
+       parser_tree_current->line.body = charalloc(token);
 //            memset(parser_tree_current->line.body, 0, leng);
 //            strcat(parser_tree_current->line.body, token);
       while(1){
-                read_token(token);
-                if(token == NULL) break;
+        read_token(token);
+        if(token == NULL) break;
         leng = strlen(parser_tree_current->line.body) + strlen(token) + 2;
-                parser_tree_current->line.body = realloc(parser_tree_current->line.body, leng);
+        parser_tree_current->line.body = realloc(parser_tree_current->line.body, leng);
         parser_tree_current->line.body[leng-1] = 0;
         strcat(parser_tree_current->line.body, " ");
         strcat(parser_tree_current->line.body, token);
-                if(!strcmp(token,"(")){
+        if(!strcmp(token,"(")){
           if(level == 0){
             // 関数検出（引数宣言開始）
             procvalid = 1;
@@ -425,15 +421,15 @@ int parser_c_source()
               // 関数宣言と判断する
               parser_tree_current->flag = PARSER_FLAG_NOP;
             }
-              break;
+            break;
           }
         }
       }
-        }
     }
-    parser_level --;
+  }
+  parser_level --;
 
-    free(token);
+  free(token);
 
-    return 0;
+  return 0;
 }

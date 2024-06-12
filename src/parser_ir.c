@@ -359,7 +359,7 @@ int parser_ir_source(char *buf)
     module_name = calloc(strlen(token)+1,1);
     strcpy(module_name, token);
 
-    // 引数取得
+    // 引数取得、モジュール名直後の括弧の中身が引数である
     level = 0;
     do{
       get_token_llvm(line, token);
@@ -1801,6 +1801,10 @@ int is_register_name(char *name)
 int is_pointer_type(char *name)
 {
   if(name[strlen(name) -1] == '*'){
+    // *が付くのは古いLLVM-IRかもしれない
+    return 1;
+  }else if(!strcmp(name, "ptr")){
+    // 新しいLLVM-IRでは*は付かないかも
     return 1;
   }else{
     return 0;

@@ -67,7 +67,7 @@ MEMORY_TREE * alloc_memory_tree(){
 }
 
 /*!
- * @brief  メモリツリーを新しくする？
+ * @brief  メモリツリーを新規作成
  */
 int new_memory_tree()
 {
@@ -83,23 +83,23 @@ int clean_memory_tree(MEMORY_TREE *memory_tree_ptr)
   MEMORY_TREE *now_memory_tree;
   MEMORY_TREE *new_memory_tree;
 
-    now_memory_tree = memory_tree_ptr;
-    while(now_memory_tree != NULL){
-        new_memory_tree = now_memory_tree->next_ptr;
-        if(now_memory_tree->label != NULL)    free(now_memory_tree->label);
-        if(now_memory_tree->verilog_args != NULL)  free(now_memory_tree->verilog_args);
-        if(now_memory_tree->type != NULL)      free(now_memory_tree->type);
-        free(now_memory_tree);
-        now_memory_tree = new_memory_tree;
-    }
-    memory_tree_top = NULL;
+  now_memory_tree = memory_tree_ptr;
+  while(now_memory_tree != NULL){
+    new_memory_tree = now_memory_tree->next_ptr;
+    if(now_memory_tree->label != NULL)    free(now_memory_tree->label);
+    if(now_memory_tree->verilog_args != NULL)  free(now_memory_tree->verilog_args);
+    if(now_memory_tree->type != NULL)      free(now_memory_tree->type);
+      free(now_memory_tree);
+      now_memory_tree = new_memory_tree;
+  }
+  memory_tree_top = NULL;
 
   if(module_name != NULL){
     free(module_name);
     module_name = NULL;
   }
 
-    return 0;
+  return 0;
 }
 
 /*!
@@ -114,8 +114,8 @@ int output_memory_tree(FILE *fp, int flag)
 {
   MEMORY_TREE *now_memory_tree;
 
-    now_memory_tree = memory_tree_top;
-    while(now_memory_tree != NULL){
+  now_memory_tree = memory_tree_top;
+  while(now_memory_tree != NULL){
     switch(flag){
       case 0:
         // 引数の表示
@@ -170,9 +170,9 @@ int output_memory_tree(FILE *fp, int flag)
         printf("[ERROR] output_memory_tree()\n");
         break;
     }
-        now_memory_tree = now_memory_tree->next_ptr;
-    }
-    return 0;
+    now_memory_tree = now_memory_tree->next_ptr;
+  }
+  return 0;
 }
 
 /*!
@@ -184,15 +184,15 @@ int print_memory_tree(MEMORY_TREE *now_memory_tree)
 
   printf("  [Memory Tree List]\n");
 
-    while(now_memory_tree != NULL){
+  while(now_memory_tree != NULL){
     printf("  %s: ", now_memory_tree->label);
     printf("  type = %s, ", now_memory_tree->type);
     printf("  flag = %d, ", now_memory_tree->flag);
     printf("\n");
-        now_memory_tree = now_memory_tree->next_ptr;
-    }
+    now_memory_tree = now_memory_tree->next_ptr;
+  }
 
-    return 0;
+  return 0;
 }
 
 /*!
@@ -293,31 +293,31 @@ int parser_memory_tree()
   int num = 0;
   int width;
 
-    printf(" -> Parser Memory Tree\n");
+  printf(" -> Parser Memory Tree\n");
 
   strcpy(verilog_args, "");
 
-    now_parser_tree_ir = parser_tree_ir_top;
-    while(now_parser_tree_ir != NULL){
+  now_parser_tree_ir = parser_tree_ir_top;
+  while(now_parser_tree_ir != NULL){
 
     if( now_parser_tree_ir->stage == 0 ){
       // stage = 0のみ対象
       switch(now_parser_tree_ir->flag){
         case PARSER_IR_FLAG_ARRAY:
-            memory_tree_current = alloc_memory_tree();
+          memory_tree_current = alloc_memory_tree();
             
-            memory_tree_current->label  = charalloc(now_parser_tree_ir->label);
-            memory_tree_current->type  = charalloc(now_parser_tree_ir->array.type);
-            memory_tree_current->num  = -1;
-            memory_tree_current->flag  = MEMORY_FLAG_GLOBAL;
-            str = charalloc(memory_tree_current->label);
-            sprintf(verilog_args, "\tinput [31:0] __base_%s,", convname(sep_p(str)));
-            sprintf(verilog_proc, "\t\t\t__sig_%s <= __base_%s;", convname(sep_p(str)), convname(sep_p(str)));
-            sprintf(verilog_decl, "\treg [31:0] __sig_%s;", convname(sep_p(str)));
-            free(str);
-            memory_tree_current->verilog_args = charalloc(verilog_args);
-            memory_tree_current->verilog_proc = charalloc(verilog_proc);
-            memory_tree_current->verilog_decl = charalloc(verilog_decl);
+          memory_tree_current->label  = charalloc(now_parser_tree_ir->label);
+          memory_tree_current->type  = charalloc(now_parser_tree_ir->array.type);
+          memory_tree_current->num  = -1;
+          memory_tree_current->flag  = MEMORY_FLAG_GLOBAL;
+          str = charalloc(memory_tree_current->label);
+          sprintf(verilog_args, "\tinput [31:0] __base_%s,", convname(sep_p(str)));
+          sprintf(verilog_proc, "\t\t\t__sig_%s <= __base_%s;", convname(sep_p(str)), convname(sep_p(str)));
+          sprintf(verilog_decl, "\treg [31:0] __sig_%s;", convname(sep_p(str)));
+          free(str);
+          memory_tree_current->verilog_args = charalloc(verilog_args);
+          memory_tree_current->verilog_proc = charalloc(verilog_proc);
+          memory_tree_current->verilog_decl = charalloc(verilog_decl);
           break;
         default:
           // ARRAY以外は処理の対象外
@@ -365,6 +365,7 @@ int parser_memory_tree()
                 !strcmp(token, "align") ||
                 !strcmp(token, "noalias") ||
                 !strcmp(token, "nocapture") ||
+                !strcmp(token, "noundef") ||
                 !strcmp(token, "nest") ||
                 !strcmp(token, "readonly") ||
                 !strcmp(token, "readnone") ||
@@ -477,9 +478,9 @@ int parser_memory_tree()
           break;
       }
     }
-        now_parser_tree_ir = now_parser_tree_ir->next_ptr;
-    }
-    return 0;
+    now_parser_tree_ir = now_parser_tree_ir->next_ptr;
+  }
+  return 0;
 }
 
 /*!

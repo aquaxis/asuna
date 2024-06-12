@@ -13,16 +13,23 @@
  */
 void example01(char *led){
 	int i = 0;
-	if( i == 5000000 ){
-		led[0] = ~led[0];
-	}else{
-		i++;
+	int count = 0;
+	while(count < 10){
+		if( i == 5000000 ){
+			i = 0;
+			led[0] = ~led[0];
+			count++;
+		}else{
+			i++;
+		}
 	}
 }
 
 void example02(char *led1, char *led2){
-	while(1){
+	int count = 0;
+	while(count < 10){
 		example01(led1);
 		example01(led2);
+		count++;
 	}
 }

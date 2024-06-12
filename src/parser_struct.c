@@ -41,11 +41,11 @@ extern PARSER_TREE_IR *parser_tree_ir_current;
 extern PARSER_TREE_IR *parser_tree_ir_prev;
 
 typedef struct struct_tree{
-    struct struct_tree *prev_ptr;
-    struct struct_tree *next_ptr;
-    char      *label;
-    char      *argument;
-    int        size;
+  struct struct_tree *prev_ptr;
+  struct struct_tree *next_ptr;
+  char      *label;
+  char      *argument;
+  int        size;
 } STRUCT_TREE;
 
 STRUCT_TREE *struct_tree_top        = NULL;
@@ -58,16 +58,16 @@ int clean_struct_tree()
   STRUCT_TREE *now_struct_tree;
   STRUCT_TREE *new_struct_tree;
 
-    now_struct_tree = struct_tree_top;
-    while(now_struct_tree != NULL){
-        new_struct_tree = now_struct_tree->next_ptr;
-        if(now_struct_tree->label != NULL) free(now_struct_tree->label);
-        if(now_struct_tree->argument != NULL) free(now_struct_tree->argument);
-        free(now_struct_tree);
-        now_struct_tree = new_struct_tree;
-    }
-    struct_tree_top = NULL;
-    return 0;
+  now_struct_tree = struct_tree_top;
+  while(now_struct_tree != NULL){
+    new_struct_tree = now_struct_tree->next_ptr;
+    if(now_struct_tree->label != NULL) free(now_struct_tree->label);
+    if(now_struct_tree->argument != NULL) free(now_struct_tree->argument);
+    free(now_struct_tree);
+    now_struct_tree = new_struct_tree;
+  }
+  struct_tree_top = NULL;
+  return 0;
 }
 
 /*!
@@ -110,17 +110,17 @@ int parser_struct_tree()
 {
   PARSER_TREE_IR *now_parser_tree_ir;
 
-    printf("[Parsing struct type for LLCM-IR]\n");
+  printf("[Parsing struct type for LLCM-IR]\n");
 
-    now_parser_tree_ir = parser_tree_ir_top;
-    while(now_parser_tree_ir != NULL){
+  now_parser_tree_ir = parser_tree_ir_top;
+  while(now_parser_tree_ir != NULL){
     if(now_parser_tree_ir->flag == PARSER_IR_FLAG_TYPE){
       register_struct_tree(now_parser_tree_ir->label, now_parser_tree_ir->type.name);
     }
-        now_parser_tree_ir = now_parser_tree_ir->next_ptr;
-    }
+    now_parser_tree_ir = now_parser_tree_ir->next_ptr;
+  }
 
-    return 0;
+  return 0;
 }
 
 /*!
@@ -132,14 +132,14 @@ int get_struct_argument(char *label, char *argument)
 
   strcpy(argument, "");
 
-    now_struct_tree = struct_tree_top;
-    while(now_struct_tree != NULL){
+  now_struct_tree = struct_tree_top;
+  while(now_struct_tree != NULL){
     if(!strcmp(now_struct_tree->label, label)){
       strcpy(argument, now_struct_tree->argument);
       break;
     }
     now_struct_tree = now_struct_tree->next_ptr;
-    }
+  }
 
   return 0;
 }
@@ -151,12 +151,12 @@ int is_struct_name(char *label)
 {
   STRUCT_TREE *now_struct_tree;
 
-    now_struct_tree = struct_tree_top;
-    while(now_struct_tree != NULL){
+  now_struct_tree = struct_tree_top;
+  while(now_struct_tree != NULL){
     if(!strcmp(now_struct_tree->label, label)) break;
-    now_struct_tree = now_struct_tree->next_ptr;
+      now_struct_tree = now_struct_tree->next_ptr;
     }
-    if(now_struct_tree == NULL) return 0;
+  if(now_struct_tree == NULL) return 0;
 
   return 1;
 }

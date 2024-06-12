@@ -14,4 +14,6 @@ extern char *charalloc(char *in);
 extern char *convname(char *buf);
 extern char *convtype(char *buf);
 
+extern int dbgprintf(const char *format, ...);
+
 #endif

@@ -33,7 +33,7 @@ char *topname;
 int debug_mode = 0;
 
 /*!
- * @brief  Process
+ * @brief  Cソースコードの分離
  */
 int split_c_source(char *filename)
 {
@@ -43,12 +43,12 @@ int split_c_source(char *filename)
 
   printf("[C Source Parser Start]\n");
 
-    read_file(filename);                // ファイルの読み込みとトークン取得
-    set_token_order_current(get_token_order_top());  // トークンのポインタをトップへ戻す
+  read_file(filename);                // ファイルの読み込みとトークン取得
+  set_token_order_current(get_token_order_top());  // トークンのポインタをトップへ戻す
 
-    parser_c_source();                  // 構文解析
-    function_count = create_proc_source();        // Processの処理
-    create_header_source();                // Lineの処理
+  parser_c_source();                  // 構文解析
+  function_count = create_proc_source();        // Processの処理
+  create_header_source();                // Lineの処理
 
   // トークンオーダーをクリーンナップする
   clean_token_order();
@@ -76,8 +76,8 @@ int split_c_source(char *filename)
  */
 int process_function(char *name)
 {
-    FILE *fp;
-    char *line, *token;
+  FILE *fp;
+  char *line, *token;
   char *filename, *oldname;
 
   printf("[LLVM-IR Function Parser Start]\n");
@@ -113,22 +113,22 @@ int process_function(char *name)
   fclose(fp);
 
   // グローバル構造体の解析
-  parser_struct_tree();      // structタイプの解析
+  parser_struct_tree();       // structタイプの解析
 
-  create_stage_parser_tree();    // ステージング
+  create_stage_parser_tree(); // ステージング
 
-  parser_memory_tree();      // メモリの解析
-  deploy_array_type();      // メモリタイプの展開する
-  create_array_size();      // メモリサイズの取得(アドレス生成)
+  parser_memory_tree();       // メモリの解析
+  deploy_array_type();        // メモリタイプの展開する
+  create_array_size();        // メモリサイズの取得(アドレス生成)
 
-  create_verilog_proc_tree();    // 実行プロセスのVerilogHDL化
+  create_verilog_proc_tree(); // 実行プロセスのVerilogHDL化
   create_verilog_signal();    // 信号のVerilogHDL化
-  create_verilog_state();      // ステートマシン生成
-  create_verilog_label();
+  create_verilog_state();     // ステートマシン生成
+  create_verilog_label();     // ラベルの生成
 
 #ifdef DEBUG
-  print_array_type();        // メモリ一覧の表示
-  print_call_tree(call_tree_top);        // CALL命令の表示
+  print_array_type();             // メモリ一覧の表示
+  print_call_tree(call_tree_top); // CALL命令の表示
 #endif
 
 #if DEBUG
@@ -152,7 +152,7 @@ int process_function(char *name)
     free(token);
     exit(1);
   }
-  output_proc_tree(fp);      // VerilogHDLの出力
+  output_proc_tree(fp); // VerilogHDLの出力
   fclose(fp);
 
   // モジュールの登録
@@ -280,6 +280,9 @@ void help()
   printf("  -h: This message\n");
 }
 
+extern char* optarg;
+extern int optind, opterr, optopt;
+
 /*!
  * @brief  メイン関数
  */
@@ -289,24 +292,23 @@ int main(int argc,char *argv[])
 
   // 引数の解析
   int opt;
-
-  opterr = 0; //getopt()のエラーメッセージを無効にする。
-
-  while ((opt = getopt(argc, argv, "fhd:")) != -1) {
-    //コマンドライン引数のオプションがなくなるまで繰り返す
+  opterr = 0; // getopt()のエラーメッセージを無効にする。
+  while ((opt = getopt(argc, argv, "fhd")) != -1) {
+    // コマンドライン引数のオプションがなくなるまで繰り返す
     switch (opt) {
       case 'f':
         filename = argv[optind++];
         break;
       case 'd':
         debug_mode = 1;
-         break;
+        break;
       case 'h':
         help();
         exit(0);
         break;
       default:
         help();
+        exit(0);
         break;
     }
   }
@@ -318,6 +320,7 @@ int main(int argc,char *argv[])
   strcat(topname, "_top");
   printf("topname: %s\n", topname);
 
+  // 高位合成の実行
   process(filename);
 
   exit(0);

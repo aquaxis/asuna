@@ -36,8 +36,8 @@ typedef struct top_signal_tree{
   struct top_signal_tree  *prev_ptr;
   struct top_signal_tree  *next_ptr;
 
-    char        *label;        // ラベル
-    int          size;
+  char        *label;        // ラベル
+  int          size;
   int          inout;        // 信号の方向、0:In、1:OUT
   int          used;        // 信号が使用されたかどうか、0:未使用、1:使用済
   char        *module_name;    // モジュール名
@@ -45,8 +45,8 @@ typedef struct top_signal_tree{
   char        *name;        // 信号名
   char        *call_name;
   int          args_num;
-    char        *verilog_signal;
-    char        *verilog_wire;
+  char        *verilog_signal;
+  char        *verilog_wire;
 } TOP_SIGNAL_TREE;
 
 TOP_SIGNAL_TREE *top_signal_tree_top        = NULL;
@@ -122,7 +122,7 @@ int get_top_signal_tree_last(TOP_SIGNAL_TREE **last_top_signal_tree)
   now_top_signal_tree = top_signal_tree_top;
     while(now_top_signal_tree != NULL){
     old_top_signal_tree = now_top_signal_tree;
-        now_top_signal_tree = old_top_signal_tree->next_ptr;
+    now_top_signal_tree = old_top_signal_tree->next_ptr;
   }
 
   *last_top_signal_tree = old_top_signal_tree;
@@ -140,13 +140,13 @@ int register_top_signal_tree(char *label,char *module_name, char *name, int flag
 
   new_top_signal_tree  = (TOP_SIGNAL_TREE *)calloc(sizeof(TOP_SIGNAL_TREE), 1);
 
-    if(top_signal_tree_top == NULL){
-        top_signal_tree_top  = new_top_signal_tree;
-    }else{
+  if(top_signal_tree_top == NULL){
+    top_signal_tree_top  = new_top_signal_tree;
+  }else{
     get_top_signal_tree_last(&now_top_signal_tree);
     now_top_signal_tree->next_ptr  = new_top_signal_tree;
     new_top_signal_tree->prev_ptr  = now_top_signal_tree;
-    }
+  }
 
   new_top_signal_tree->label      = calloc(strlen(label)+1,1);
   strcpy(new_top_signal_tree->label, label);
@@ -169,7 +169,7 @@ int register_top_signal_tree(char *label,char *module_name, char *name, int flag
   new_top_signal_tree->size      = size;
   new_top_signal_tree->used      = 0;
 
-    return 0;
+  return 0;
 }
 
 /*!
@@ -194,7 +194,7 @@ char *search_top_signal_call_args(char *call_name, int args_num)
 //printf("call_name: %s\n", signal_name);
 
   now_top_signal_tree = top_signal_tree_top;
-    while(now_top_signal_tree != NULL){
+  while(now_top_signal_tree != NULL){
     if(now_top_signal_tree->flag == FLAG_CALL){
       if(!strcmp(now_top_signal_tree->label, label)){
         sprintf(result, "%s %s |", result, now_top_signal_tree->verilog_signal);
@@ -202,7 +202,7 @@ char *search_top_signal_call_args(char *call_name, int args_num)
 //printf("    call_name: %s <> %s\n", now_top_signal_tree->label, label);
       }
     }
-        now_top_signal_tree = now_top_signal_tree->next_ptr;
+    now_top_signal_tree = now_top_signal_tree->next_ptr;
   }
 
   if(strlen(result) > 0){
@@ -244,7 +244,7 @@ char *search_top_signal_func(char *func, char *call_name, char *args)
 //printf("call_name: %s\n", signal_name);
 
   now_top_signal_tree = top_signal_tree_top;
-    while(now_top_signal_tree != NULL){
+  while(now_top_signal_tree != NULL){
 //printf("    call_name: %s <> %s\n", now_top_signal_tree->label, label);
     if(now_top_signal_tree->flag == FLAG_CALL){
       if(!strcmp(now_top_signal_tree->label, label)){
@@ -273,7 +273,7 @@ char *search_top_signal_func(char *func, char *call_name, char *args)
     }
 
 
-        now_top_signal_tree = now_top_signal_tree->next_ptr;
+    now_top_signal_tree = now_top_signal_tree->next_ptr;
   }
 
   if(strlen(result) > 0){
@@ -304,7 +304,7 @@ int create_top_assign()
   wire = calloc(STR_MAX, 1);
 
   now_top_signal_tree = top_signal_tree_top;
-    while(now_top_signal_tree != NULL){
+  while(now_top_signal_tree != NULL){
     if(now_top_signal_tree->inout == SIG_IN){
 //      sprintf(wire, "assign %s = ", now_top_signal_tree->label);
       sprintf(wire, "assign %s = ", now_top_signal_tree->verilog_signal);
@@ -377,34 +377,35 @@ int create_top_assign()
   sprintf(wire, "\n");
   register_top_module_assign(wire);
 
-if(use_gm_if){
-  sprintf(wire, "// Global Memory\n");
-  register_top_module_assign(wire);
+  if(use_gm_if){
+    sprintf(wire, "// Global Memory\n");
+    register_top_module_assign(wire);
 
-  // Global Memory
-  verilog = search_top_signal_func("gm", NULL, "req");
-  sprintf(wire, "assign __gm_req = %s\n", verilog);
-  register_top_module_assign(wire);
+    // Global Memory
+    verilog = search_top_signal_func("gm", NULL, "req");
+    sprintf(wire, "assign __gm_req = %s\n", verilog);
+    register_top_module_assign(wire);
 
-  verilog = search_top_signal_func("gm", NULL, "adrs");
-  sprintf(wire, "assign __gm_adrs = %s\n", verilog);
-  register_top_module_assign(wire);
+    verilog = search_top_signal_func("gm", NULL, "adrs");
+    sprintf(wire, "assign __gm_adrs = %s\n", verilog);
+    register_top_module_assign(wire);
 
-  verilog = search_top_signal_func("gm", NULL, "rnw");
-  sprintf(wire, "assign __gm_rnw = %s\n", verilog);
-  register_top_module_assign(wire);
+    verilog = search_top_signal_func("gm", NULL, "rnw");
+    sprintf(wire, "assign __gm_rnw = %s\n", verilog);
+    register_top_module_assign(wire);
 
-  verilog = search_top_signal_func("gm", NULL, "do");
-  sprintf(wire, "assign __gm_do = %s\n", verilog);
-  register_top_module_assign(wire);
+    verilog = search_top_signal_func("gm", NULL, "do");
+    sprintf(wire, "assign __gm_do = %s\n", verilog);
+    register_top_module_assign(wire);
 
-  verilog = search_top_signal_func("gm", NULL, "leng");
-  sprintf(wire, "assign __gm_leng = %s\n", verilog);
-  register_top_module_assign(wire);
+    verilog = search_top_signal_func("gm", NULL, "leng");
+    sprintf(wire, "assign __gm_leng = %s\n", verilog);
+    register_top_module_assign(wire);
 
-  sprintf(wire, "\n");
-  register_top_module_assign(wire);
-}
+    sprintf(wire, "\n");
+    register_top_module_assign(wire);
+  }
+
   // LLVM memcpy
   verilog = search_top_signal_func("call", "llvm_memcpy", "req");
   if(verilog != NULL){
@@ -418,7 +419,7 @@ if(use_gm_if){
   }
 
   now_top_signal_tree = top_signal_tree_top;
-    while(now_top_signal_tree != NULL){
+  while(now_top_signal_tree != NULL){
     if(now_top_signal_tree->inout == SIG_IN){
       sprintf(wire, "assign %s = ", now_top_signal_tree->verilog_signal);
 
@@ -468,7 +469,7 @@ int create_top_nowire(FILE *fp)
   TOP_SIGNAL_TREE *now_top_signal_tree;
 
   now_top_signal_tree = top_signal_tree_top;
-    while(now_top_signal_tree != NULL){
+  while(now_top_signal_tree != NULL){
     if(now_top_signal_tree->used == 0){
       if(now_top_signal_tree->flag == FLAG_ARGS){
         if(now_top_signal_tree->inout == SIG_IN){
@@ -488,7 +489,7 @@ int create_top_nowire(FILE *fp)
         fprintf(fp, "%s\n", now_top_signal_tree->label);
       }
     }
-        now_top_signal_tree = now_top_signal_tree->next_ptr;
+    now_top_signal_tree = now_top_signal_tree->next_ptr;
   }
 
   return 0;
@@ -502,7 +503,7 @@ int create_top_nofunc(FILE *fp)
   TOP_SIGNAL_TREE *now_top_signal_tree;
 
   now_top_signal_tree = top_signal_tree_top;
-    while(now_top_signal_tree != NULL){
+  while(now_top_signal_tree != NULL){
     if((now_top_signal_tree->used == 0) && (
       (now_top_signal_tree->flag == FLAG_CTRL) ||
       (now_top_signal_tree->flag == FLAG_ARGS) ||
@@ -515,7 +516,7 @@ int create_top_nofunc(FILE *fp)
         fprintf(fp, "assign %s = %s;\n", now_top_signal_tree->label, now_top_signal_tree->verilog_signal);
       }
     }
-        now_top_signal_tree = now_top_signal_tree->next_ptr;
+    now_top_signal_tree = now_top_signal_tree->next_ptr;
   }
 
   return 0;
@@ -532,17 +533,17 @@ int create_top_global(FILE *fp)
   char *label;
   label        = calloc(STR_MAX, 1);
 
-    now_module_tree = module_tree_top;
-    while(now_module_tree != NULL){
-      now_memory_tree = now_module_tree->memory_tree_ptr;
-      while(now_memory_tree != NULL){
-        if(now_memory_tree->flag == MEMORY_FLAG_GLOBAL){
-          sprintf(label, "%s", convname(sep_p(now_memory_tree->label)));
-          fprintf(fp, "\tinput [31:0] __base_%s,\n", label);
-        }
-        now_memory_tree = now_memory_tree->next_ptr;
+  now_module_tree = module_tree_top;
+  while(now_module_tree != NULL){
+    now_memory_tree = now_module_tree->memory_tree_ptr;
+    while(now_memory_tree != NULL){
+      if(now_memory_tree->flag == MEMORY_FLAG_GLOBAL){
+        sprintf(label, "%s", convname(sep_p(now_memory_tree->label)));
+        fprintf(fp, "\tinput [31:0] __base_%s,\n", label);
       }
-        now_module_tree = now_module_tree->next_ptr;
+      now_memory_tree = now_memory_tree->next_ptr;
+    }
+    now_module_tree = now_module_tree->next_ptr;
   }
 
   return 0;
@@ -568,16 +569,16 @@ int create_top_module()
 
   printf("[Create top Module]\n");
 
-  call_signal_name  = calloc(STR_MAX, 1);
-  label        = calloc(STR_MAX, 1);
-  verilog_signal    = calloc(STR_MAX, 1);
-  verilog_wire    = calloc(STR_MAX, 1);
-  verilog_module    = calloc(STR_MAX, 1);
+  call_signal_name = calloc(STR_MAX, 1);
+  label            = calloc(STR_MAX, 1);
+  verilog_signal   = calloc(STR_MAX, 1);
+  verilog_wire     = calloc(STR_MAX, 1);
+  verilog_module   = calloc(STR_MAX, 1);
 
-    now_module_tree = module_tree_top;
-    while(now_module_tree != NULL){
+  now_module_tree  = module_tree_top;
+  while(now_module_tree != NULL){
     // 初期化
-    args_num = 0;
+    args_num    = 0;
     module_name = calloc(strlen(now_module_tree->module_name)+1,1);
     strcpy(module_name, convname(sep_p(now_module_tree->module_name)));
 
@@ -697,11 +698,8 @@ int create_top_module()
       while(now_memory_tree != NULL){
         if(now_memory_tree->flag == MEMORY_FLAG_GLOBAL){
           sprintf(label, "%s", convname(sep_p(now_memory_tree->label)));
-//          sprintf(verilog_signal, "%s%s", module_name, label);
           sprintf(verilog_module, "\t.__base_%s(__base_%s),\n", label, label);
           register_top_module_decl(verilog_module);
-//          sprintf(verilog_wire, "wire [31:0] %s", module_name);
-//          register_top_signal_tree(label, verilog_signal, 0, 0, verilog_wire);
         }
         now_memory_tree = now_memory_tree->next_ptr;
       }
@@ -721,8 +719,6 @@ int create_top_module()
           sprintf(verilog_signal, "%s%s", module_name, label);
           sprintf(verilog_module, "\t.%s(%s),\n", label, verilog_signal);
           register_top_module_decl(verilog_module);
-//          sprintf(verilog_wire, "wire [31:0] %s", verilog_signal);
-//          register_top_signal_tree(label, module_name, label, 0, 0, 0, verilog_signal, verilog_wire);
 
           if(now_memory_tree->size > 0){
             sprintf(verilog_wire, "wire [%d:0] %s;", now_memory_tree->size*8-1, verilog_signal);
@@ -811,83 +807,70 @@ int create_top_module()
       }
     }
 
-//    sprintf(verilog_module, "\n");
-//    register_top_module_decl(verilog_module);
-//    sprintf(verilog_module, "\t.__dummy()\n");
-//    register_top_module_decl(verilog_module);
     sprintf(verilog_module, ");\n");
     register_top_module_decl(verilog_module);
 
-        now_module_tree = now_module_tree->next_ptr;
+    now_module_tree = now_module_tree->next_ptr;
 
-        free(module_name);
-    }
+    free(module_name);
+  }
 
-    free(call_signal_name);
-    free(verilog_signal);
+  free(call_signal_name);
+  free(verilog_signal);
 
   return 0;
 }
 
 /*!
- * @brief
+ * @brief トップモジュールの出力
  */
 int output_top_module(FILE *fp, char *topname)
 {
   fprintf(fp,"/*\n");
-  fprintf(fp," * Copyright (C)2005-2015 AQUAXIS TECHNOLOGY.\n");
+  fprintf(fp," * Copyright (C)2005-2024 AQUAXIS TECHNOLOGY.\n");
   fprintf(fp," *  Don't remove this header.\n");
   fprintf(fp," * When you use this source, there is a need to inherit this header.\n");
   fprintf(fp," *\n");
   fprintf(fp," * This software is released under the MIT License.\n");
-  fprintf(fp," * http://opensource.org/licenses/mit-license.php\n");
-  fprintf(fp," *\n");
-  fprintf(fp," * For further information please contact.\n");
-  fprintf(fp," *  URI:    http://www.aquaxis.com/\n");
-  fprintf(fp," *  E-Mail: info(at)aquaxis.com\n");
+  fprintf(fp," * https://opensource.org/license/mit\n");
   fprintf(fp," */\n");
 
   fprintf(fp,"module %s(\n", topname);
 
-  fprintf(fp,"\tinput system_clock,\n");
-  fprintf(fp,"\tinput system_reset,\n");
-  fprintf(fp,"\tinput __func_start,\n");
-  fprintf(fp,"\toutput __func_done,\n");
-//  fprintf(fp,"\toutput __func_idle,\n");
-  fprintf(fp,"\toutput __func_ready,\n\n");
+  fprintf(fp,"\tinput  wire       system_clock,\n");
+  fprintf(fp,"\tinput  wire       system_reset,\n");
+  fprintf(fp,"\tinput  wire       __func_start,\n");
+  fprintf(fp,"\toutput wire       __func_done,\n");
+// fprintf(fp,"\toutput wire         __func_idle,\n");
+  fprintf(fp,"\toutput wire       __func_ready,\n\n");
 
-if(use_gm_if){
-  fprintf(fp,"\tinput [31:0] __gm_base,\n");
-  fprintf(fp,"\toutput __gm_req,\n");
-  fprintf(fp,"\toutput __gm_rnw,\n");
-  fprintf(fp,"\tinput __gm_done,\n");
-  fprintf(fp,"\toutput [31:0] __gm_adrs,\n");
-  fprintf(fp,"\toutput [1:0] __gm_leng,\n");
-  fprintf(fp,"\tinput [31:0] __gm_di,\n");
-  fprintf(fp,"\toutput [31:0] __gm_do,\n\n");
-}
-
-  if(use_llvm_memcpy){
-    fprintf(fp,"\toutput __llvm_memcpy_req,\n");
-    fprintf(fp,"\tinput __llvm_memcpy_ready,\n");
-    fprintf(fp,"\tinput __llvm_memcpy_done,\n");
-    fprintf(fp,"\toutput [7:0] __llvm_memcpy_args_0,\n");
-    fprintf(fp,"\toutput [7:0] __llvm_memcpy_args_1,\n");
-    fprintf(fp,"\toutput [31:0] __llvm_memcpy_args_2,\n");
-    fprintf(fp,"\toutput [31:0] __llvm_memcpy_args_3,\n");
-    fprintf(fp,"\toutput [31:0] __llvm_memcpy_args_4,\n\n");
+  if(use_gm_if){
+    fprintf(fp,"\tinput  wire [31:0] __gm_base,\n");
+    fprintf(fp,"\toutput wire        __gm_req,\n");
+    fprintf(fp,"\toutput wire        __gm_rnw,\n");
+    fprintf(fp,"\tinput  wire        __gm_done,\n");
+    fprintf(fp,"\toutput wire [31:0] __gm_adrs,\n");
+    fprintf(fp,"\toutput wire [ 1:0] __gm_leng,\n");
+    fprintf(fp,"\tinput  wire [31:0] __gm_di,\n");
+    fprintf(fp,"\toutput wire [31:0] __gm_do,\n\n");
   }
 
+  if(use_llvm_memcpy){
+    fprintf(fp,"\toutput wire        __llvm_memcpy_req,\n");
+    fprintf(fp,"\tinput  wire        __llvm_memcpy_ready,\n");
+    fprintf(fp,"\tinput  wire        __llvm_memcpy_done,\n");
+    fprintf(fp,"\toutput wire [ 7:0] __llvm_memcpy_args_0,\n");
+    fprintf(fp,"\toutput wire [ 7:0] __llvm_memcpy_args_1,\n");
+    fprintf(fp,"\toutput wire [31:0] __llvm_memcpy_args_2,\n");
+    fprintf(fp,"\toutput wire [31:0] __llvm_memcpy_args_3,\n");
+    fprintf(fp,"\toutput wire [31:0] __llvm_memcpy_args_4,\n\n");
+  }
 
   // ToDo:
   // 外部信号を入れる
   fprintf(fp,"\t// global signal\n");
   create_top_global(fp);
-//  fprintf(fp,"\t// nowire\n");
   create_top_nowire(fp);
-
-//  fprintf(fp,"\n\toutput dummy\n");
-
   fprintf(fp,");\n");
 
   // Wire宣言を入れる
@@ -895,9 +878,11 @@ if(use_gm_if){
   create_top_wire(fp);
   fprintf(fp,"// connection\n");
   fprintf(fp,"%s", top_module_assign);
+  fprintf(fp,");\n");
 
   fprintf(fp,"// system signal\n");
   create_top_nofunc(fp);
+  fprintf(fp,");\n");
 
   fprintf(fp,"// modules\n");
   fprintf(fp,"%s", top_module_decl);

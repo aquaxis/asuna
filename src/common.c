@@ -18,6 +18,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <assert.h>
+#include <stdarg.h>
 
 #include "common.h"
 
@@ -42,13 +45,17 @@ int get_width(char *buf)
     // ポインタ宣言(ポインタは最後に'*'が付く)
     // ポインタはi8*, i16*, i32*, %構造体名*, ARRAY宣言*, を想定
     size = 32;
+  }else if(!strcmp(buf, "ptr")){
+    // ポインタ宣言(ポインタは最後に'*'が付く)
+    // ポインタはi8*, i16*, i32*, %構造体名*, ARRAY宣言*, を想定
+    size = 32;
   }else{
     /*
      * ToDo:
      * ちゃんと処理すること。いまのところ暫定だよ。
      */
     size = 32;
-    printf("[WRANING] get_width(): %s¥n", buf);
+    printf("[WARNING] get_width(): %s¥n", buf);
   }
 
   return size;
@@ -103,4 +110,39 @@ char *convtype(char *buf)
     buf[strlen(buf)-1] = 0;
   }
   return buf;
+}
+
+#ifdef DEBUG
+int dbgvprintf(char const *format, va_list ap)
+{
+  int ret = 0;
+
+    static FILE	*logfile;
+
+    if (logfile == NULL) {
+      char ctmp[256];
+
+      sprintf(ctmp, "debug-%ld.log", (long)getpid());
+      logfile = fopen(ctmp, "w");
+      assert(logfile != NULL);
+    }
+    vfprintf(stdout, format, ap);
+    ret = vfprintf(logfile, format, ap);
+    fflush(logfile);
+
+  return ret;
+}
+#endif
+
+int dbgprintf(const char *format, ...)
+{
+  int ret = 0;
+#ifdef DEBUG
+  va_list ap;
+
+  va_start(ap, format);
+  ret = dbgvprintf(format, ap);
+  va_end(ap);
+#endif
+  return ret;
 }

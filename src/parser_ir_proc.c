@@ -35,12 +35,12 @@ extern PARSER_TREE_IR *parser_tree_ir_prev;
 
 extern char *module_name;
 
-PROC_TREE *proc_tree_top        = NULL;
+PROC_TREE *proc_tree_top = NULL;
 
-char *verilog_wire    = NULL;
-char *verilog_module  = NULL;
-char *verilog_state    = NULL;
-int is_module_gm_if    = 0;
+char *verilog_wire       = NULL;
+char *verilog_module     = NULL;
+char *verilog_state      = NULL;
+int is_module_gm_if      = 0;
 
 /*!
  * @brief  ツリーの領域確保
@@ -56,7 +56,7 @@ PROC_TREE * alloc_proc_tree(){
     now_proc_tree = now_proc_tree->next_ptr;
   }
 
-  now_proc_tree        = (PROC_TREE *)calloc(sizeof(PROC_TREE),1);
+  now_proc_tree            = (PROC_TREE *)calloc(sizeof(PROC_TREE),1);
   now_proc_tree->prev_ptr  = old_proc_tree;
   now_proc_tree->next_ptr  = NULL;
 
@@ -76,14 +76,14 @@ PROC_TREE * recall_proc_tree(int stage)
 {
   PROC_TREE *now_proc_tree;
 
-    now_proc_tree = proc_tree_top;
-    while(now_proc_tree != NULL){
-        if(now_proc_tree->stage == stage){
+  now_proc_tree = proc_tree_top;
+  while(now_proc_tree != NULL){
+    if(now_proc_tree->stage == stage){
       return now_proc_tree;
     }
-        now_proc_tree = now_proc_tree->next_ptr;
-    }
-    return NULL;
+    now_proc_tree = now_proc_tree->next_ptr;
+  }
+  return NULL;
 }
 
 /*!
@@ -94,12 +94,12 @@ PROC_TREE * recall_proc_tree_end()
   PROC_TREE *now_proc_tree;
   PROC_TREE *old_proc_tree;
 
-    now_proc_tree = proc_tree_top;
-    while(now_proc_tree != NULL){
+  now_proc_tree = proc_tree_top;
+  while(now_proc_tree != NULL){
     old_proc_tree = now_proc_tree;
-        now_proc_tree = now_proc_tree->next_ptr;
-    }
-    return old_proc_tree;
+    now_proc_tree = now_proc_tree->next_ptr;
+  }
+  return old_proc_tree;
 }
 
 /*!
@@ -110,22 +110,22 @@ int clean_proc_tree()
   PROC_TREE *now_proc_tree;
   PROC_TREE *new_proc_tree;
 
-    now_proc_tree = proc_tree_top;
-    while(now_proc_tree != NULL){
-        new_proc_tree = now_proc_tree->next_ptr;
-        if(now_proc_tree->seq_req.state != NULL)    free(now_proc_tree->seq_req.state);
-        if(now_proc_tree->seq_req.condision != NULL)  free(now_proc_tree->seq_req.condision);
-        if(now_proc_tree->seq_req.body != NULL)      free(now_proc_tree->seq_req.body);
-        if(now_proc_tree->seq_wait.state != NULL)    free(now_proc_tree->seq_wait.state);
-        if(now_proc_tree->seq_wait.condision != NULL)  free(now_proc_tree->seq_wait.condision);
-        if(now_proc_tree->seq_wait.body != NULL)    free(now_proc_tree->seq_wait.body);
-        if(now_proc_tree->seq_exec.state != NULL)    free(now_proc_tree->seq_exec.state);
-        if(now_proc_tree->seq_exec.condision != NULL)  free(now_proc_tree->seq_exec.condision);
-        if(now_proc_tree->seq_exec.body != NULL)    free(now_proc_tree->seq_exec.body);
-        free(now_proc_tree);
-        now_proc_tree = new_proc_tree;
-    }
-    proc_tree_top = NULL;
+  now_proc_tree = proc_tree_top;
+  while(now_proc_tree != NULL){
+    new_proc_tree = now_proc_tree->next_ptr;
+    if(now_proc_tree->seq_req.state != NULL)      free(now_proc_tree->seq_req.state);
+    if(now_proc_tree->seq_req.condision != NULL)  free(now_proc_tree->seq_req.condision);
+    if(now_proc_tree->seq_req.body != NULL)       free(now_proc_tree->seq_req.body);
+    if(now_proc_tree->seq_wait.state != NULL)     free(now_proc_tree->seq_wait.state);
+    if(now_proc_tree->seq_wait.condision != NULL) free(now_proc_tree->seq_wait.condision);
+    if(now_proc_tree->seq_wait.body != NULL)      free(now_proc_tree->seq_wait.body);
+    if(now_proc_tree->seq_exec.state != NULL)     free(now_proc_tree->seq_exec.state);
+    if(now_proc_tree->seq_exec.condision != NULL) free(now_proc_tree->seq_exec.condision);
+    if(now_proc_tree->seq_exec.body != NULL)      free(now_proc_tree->seq_exec.body);
+    free(now_proc_tree);
+    now_proc_tree = new_proc_tree;
+  }
+  proc_tree_top = NULL;
 
   if(verilog_wire != NULL){
     free(verilog_wire);
@@ -142,7 +142,7 @@ int clean_proc_tree()
 
   is_module_gm_if = 0;
 
-    return 0;
+  return 0;
 }
 
 /*!
@@ -153,12 +153,12 @@ int print_proc_tree(FILE *fp)
 {
   PROC_TREE *now_proc_tree;
 
-    fprintf(fp,"==============================\n");
-    fprintf(fp,"Print - Proc Tree\n");
-    fprintf(fp,"==============================\n");
-    now_proc_tree = proc_tree_top;
-    while(1){
-        if(now_proc_tree == NULL) break;
+  fprintf(fp,"==============================\n");
+  fprintf(fp,"Print - Proc Tree\n");
+  fprintf(fp,"==============================\n");
+  now_proc_tree = proc_tree_top;
+  while(1){
+    if(now_proc_tree == NULL) break;
 
     fprintf(fp,"Stage: %d\n", now_proc_tree->stage);
 
@@ -175,22 +175,21 @@ int print_proc_tree(FILE *fp)
       if(now_proc_tree->seq_exec.body != NULL )    fprintf(fp," exec-b ->\n%s\n", now_proc_tree->seq_exec.body);
     }
 
-        now_proc_tree = now_proc_tree->next_ptr;
-    }
+    now_proc_tree = now_proc_tree->next_ptr;
+  }
 
   fprintf(fp,"verilog_wire:\n%s\n", verilog_wire);
 
   fprintf(fp,"memory:\n");
   output_memory_tree(fp, 0);
 
-    fprintf(fp,"==============================\n");
+  fprintf(fp,"==============================\n");
 
-    return 0;
+  return 0;
 }
 
 /*!
  * @brief  VerilogHDLの出力
- *
  */
 int output_proc_tree(FILE *fp)
 {
@@ -201,35 +200,31 @@ int output_proc_tree(FILE *fp)
 
   // モジュールヘッダの生成
   fprintf(fp,"/*\n");
-  fprintf(fp," * Copyright (C)2005-2015 AQUAXIS TECHNOLOGY.\n");
+  fprintf(fp," * Copyright (C)2005-2024 AQUAXIS TECHNOLOGY.\n");
   fprintf(fp," *  Don't remove this header.\n");
   fprintf(fp," * When you use this source, there is a need to inherit this header.\n");
   fprintf(fp," *\n");
   fprintf(fp," * This software is released under the MIT License.\n");
-  fprintf(fp," * http://opensource.org/licenses/mit-license.php\n");
-  fprintf(fp," *\n");
-  fprintf(fp," * For further information please contact.\n");
-  fprintf(fp," *  URI:    http://www.aquaxis.com/\n");
-  fprintf(fp," *  E-Mail: info(at)aquaxis.com\n");
+  fprintf(fp," * https://opensource.org/license/mit\n");
   fprintf(fp," */\n");
 
   fprintf(fp,"module %s(\n", sep_p(module_name));
-  fprintf(fp,"\tinput __func_clock,\n");
-  fprintf(fp,"\tinput __func_reset,\n");
-  fprintf(fp,"\tinput __func_start,\n");
-  fprintf(fp,"\toutput reg __func_done,\n");
-  fprintf(fp,"\toutput reg __func_ready,\n\n");
+  fprintf(fp,"\tinput  wire        __func_clock,\n");
+  fprintf(fp,"\tinput  wire        __func_reset,\n");
+  fprintf(fp,"\tinput  wire        __func_start,\n");
+  fprintf(fp,"\toutput reg         __func_done,\n");
+  fprintf(fp,"\toutput reg         __func_ready,\n\n");
 
   if(is_module_gm_if){
     fprintf(fp,"\t// Global Memory\n");
-    fprintf(fp,"\tinput [31:0] __gm_base,\n");
-    fprintf(fp,"\toutput reg __gm_req,\n");
-    fprintf(fp,"\toutput reg __gm_rnw,\n");
-    fprintf(fp,"\tinput __gm_done,\n");
-    fprintf(fp,"\toutput reg [31:0] __gm_adrs,\n");
-    fprintf(fp,"\toutput reg [1:0] __gm_leng,\n");
-    fprintf(fp,"\tinput [31:0] __gm_di,\n");
-    fprintf(fp,"\toutput reg [31:0] __gm_do,\n\n");
+    fprintf(fp,"\tinput  wire [31:0] __gm_base,\n");
+    fprintf(fp,"\toutput reg         __gm_req,\n");
+    fprintf(fp,"\toutput reg         __gm_rnw,\n");
+    fprintf(fp,"\tinput  wire        __gm_done,\n");
+    fprintf(fp,"\toutput reg  [31:0] __gm_adrs,\n");
+    fprintf(fp,"\toutput reg  [ 1:0] __gm_leng,\n");
+    fprintf(fp,"\tinput  wire [31:0] __gm_di,\n");
+    fprintf(fp,"\toutput reg  [31:0] __gm_do,\n\n");
   }
 
   fprintf(fp,"\t// Memory Singal\n");
@@ -259,7 +254,7 @@ int output_proc_tree(FILE *fp)
 
   output_verilog_sdiv(fp);
 
-    now_proc_tree = proc_tree_top;
+  now_proc_tree = proc_tree_top;
 
   // ステートマシンの生成
   fprintf(fp,"always @(posedge __func_clock or negedge __func_reset) begin\n");
@@ -295,7 +290,7 @@ int output_proc_tree(FILE *fp)
   fprintf(fp,"\t__label_pre <= __label_0;\n");
   fprintf(fp,"\t\tend\n");
 
-    while(now_proc_tree != NULL){
+  while(now_proc_tree != NULL){
     if(now_proc_tree->seq_req.ena){
       fprintf(fp, "\t\t__state_%d_req: begin\n", now_proc_tree->stage);
       fprintf(fp, "%s", now_proc_tree->seq_req.state);
@@ -317,8 +312,8 @@ int output_proc_tree(FILE *fp)
           fprintf(fp, "%s\n", now_proc_tree->seq_exec.state);
         }
       }else{
-            next_proc_tree = now_proc_tree->next_ptr;
-            if(next_proc_tree != NULL){
+        next_proc_tree = now_proc_tree->next_ptr;
+        if(next_proc_tree != NULL){
           if(next_proc_tree->seq_req.ena){
             fprintf(fp, "\t\t\t__state <= __state_%d_req;\n", now_proc_tree->stage + 1);
           }else if(next_proc_tree->seq_wait.ena){
@@ -331,8 +326,8 @@ int output_proc_tree(FILE *fp)
       if(now_proc_tree->seq_exec.body != NULL )  fprintf(fp, "%s", now_proc_tree->seq_exec.body);
       fprintf(fp, "\t\tend\n");
     }
-        now_proc_tree = now_proc_tree->next_ptr;
-    }
+      now_proc_tree = now_proc_tree->next_ptr;
+  }
 
   fprintf(fp,"\t\t__state_fin_exec: begin\n");
   fprintf(fp,"\t\t\t__state <= __state_start_req;\n");
@@ -346,7 +341,7 @@ int output_proc_tree(FILE *fp)
 
   fprintf(fp,"endmodule\n");
 
-    return 0;
+  return 0;
 }
 
 /*!
@@ -473,6 +468,7 @@ int create_verilog_call_args(char *name, char *args, char *buf, int is_call)
         !strcmp(token, "align") ||
         !strcmp(token, "noalias") ||
         !strcmp(token, "nocapture") ||
+        !strcmp(token, "noundef") ||
         !strcmp(token, "nest") ||
         !strcmp(token, "readonly") ||
         !strcmp(token, "readnone") ||
@@ -518,7 +514,7 @@ int create_verilog_call_args(char *name, char *args, char *buf, int is_call)
 }
 
 /*!
- * @brief  CALL命令の戻り値の
+ * @brief  CALL命令の戻り値の格納を生成
  *
  * @note
  * 戻り値のコードとI/Fを生成する
@@ -532,27 +528,27 @@ int create_verilog_call_result(char *name, char *reg, char *type, char *buf, int
   temp = calloc(STR_MAX, 1);
   strcpy(buf, "");
 
-    str = regalloc(reg);
-    sprintf(temp, "\t\t\t%s <= __call_%s_result;\n", str, name);
-    free(str);
-    strcat(buf, temp);
+  str = regalloc(reg);
+  sprintf(temp, "\t\t\t%s <= __call_%s_result;\n", str, name);
+  free(str);
+  strcat(buf, temp);
 
-    // インターフェースの作成
-    if(!strcmp(type, "i8")){
-      width = 8;
-    }else if(!strcmp(type, "i16")){
-      width = 16;
-    }else if(
-      !strcmp(type, "i32") ||
-      !strcmp(type, "i8*") || !strcmp(type, "i16*") || !strcmp(type, "i32*")
-    ){
-      width = 32;
-    }else{
-      // ポインタの場合はここに入る
-      width = 32;
-    }
-    // call_sianal_treeへ登録
-    if(!is_call) register_call_signal_tree(name, "result", 0, width, 0);
+  // インターフェースの作成
+  if(!strcmp(type, "i8")){
+    width = 8;
+  }else if(!strcmp(type, "i16")){
+    width = 16;
+  }else if(
+    !strcmp(type, "i32") ||
+    !strcmp(type, "i8*") || !strcmp(type, "i16*") || !strcmp(type, "i32*")
+  ){
+    width = 32;
+  }else{
+    // ポインタの場合はここに入る
+    width = 32;
+  }
+  // call_sianal_treeへ登録
+  if(!is_call) register_call_signal_tree(name, "result", 0, width, 0);
 
   free(temp);
 
@@ -695,7 +691,7 @@ int get_getelement_type(char *line, char *result)
  */
 char * register_verilog(char *body, char *buf)
 {
-    char *temp = NULL;
+  char *temp = NULL;
 
   // Verilogコード登録
   if(body != NULL){
@@ -721,14 +717,14 @@ int create_verilog_proc_tree()
 {
   PROC_TREE *proc_tree_current    = NULL;
   PARSER_TREE_IR *now_parser_tree_ir;
-    char *token;
-    char *buf;
-    char *args_buf;
-    int leng;
-    char *label;
-    char *value;
+  char *token;
+  char *buf;
+  char *args_buf;
+  int leng;
+  char *label;
+  char *value;
 
-    char *str1, *str2, *str3, *str4;
+  char *str1, *str2, *str3, *str4;
   char *line_buf;
   char *call_name;
 
@@ -741,9 +737,9 @@ int create_verilog_proc_tree()
   label = calloc(STR_MAX, 1);
   value = calloc(STR_MAX, 1);
 
-    printf(" -> Create VerilogHDL for Proc Tree\n");
-    now_parser_tree_ir = parser_tree_ir_top;
-    while(now_parser_tree_ir != NULL){
+  printf(" -> Create VerilogHDL for Proc Tree\n");
+  now_parser_tree_ir = parser_tree_ir_top;
+  while(now_parser_tree_ir != NULL){
     if( now_parser_tree_ir->stage != 0 ){
       if(proc_tree_current == NULL){
         // ツリーがなければ新規生成
@@ -886,6 +882,7 @@ int create_verilog_proc_tree()
            */
           create_verilog_call_args(&now_parser_tree_ir->call.name[1], now_parser_tree_ir->call.argument, args_buf, is_call);
           proc_tree_current->seq_req.body = register_verilog(proc_tree_current->seq_req.body, args_buf);
+
           // waitプロセス
           // 条件
           sprintf(buf, "(__call_%s_done == 1)",
@@ -901,9 +898,12 @@ int create_verilog_proc_tree()
           // execプロセス
           /*
            * CALLの戻り値を格納する
+           * CALLの戻り値がvoidの場合、labelが存在しないので追加しない
            */
-          create_verilog_call_result(&now_parser_tree_ir->call.name[1], now_parser_tree_ir->label, now_parser_tree_ir->call.result_type, args_buf, is_call);
-          proc_tree_current->seq_exec.body = register_verilog(proc_tree_current->seq_exec.body, args_buf);
+          if(strlen(now_parser_tree_ir->label) > 0){
+            create_verilog_call_result(&now_parser_tree_ir->call.name[1], now_parser_tree_ir->label, now_parser_tree_ir->call.result_type, args_buf, is_call);
+            proc_tree_current->seq_exec.body = register_verilog(proc_tree_current->seq_exec.body, args_buf);
+          }
           free(str1);
 
           break;
@@ -1024,7 +1024,7 @@ int create_verilog_proc_tree()
              * ちゃんと処理すること。いまのところ暫定だよ。
              */
             leng = 4;
-            printf("[WRANING] LENGTH: %s\n", now_parser_tree_ir->reg.input_right_type);
+            printf("[WARNING] LENGTH: %s\n", now_parser_tree_ir->reg.input_right_type);
           }
           sprintf(buf, "\t\t\t__gm_leng <= %d;\n",
             leng-1
@@ -1353,8 +1353,8 @@ int create_verilog_proc_tree()
     }else{
     }
 
-        now_parser_tree_ir = now_parser_tree_ir->next_ptr;
-    }
+    now_parser_tree_ir = now_parser_tree_ir->next_ptr;
+  }
 
   free(token);
   free(buf);
@@ -1362,7 +1362,7 @@ int create_verilog_proc_tree()
   free(label);
   free(value);
 
-    return 0;
+  return 0;
 }
 
 /*!
@@ -1385,7 +1385,7 @@ int create_verilog_state()
   sprintf(buf, "localparam __state_start_exec = 3;\n");
   verilog_state = register_verilog(verilog_state, buf);
 
-    while(now_proc_tree != NULL){
+  while(now_proc_tree != NULL){
     if(now_proc_tree->seq_req.ena){
       sprintf(buf, "localparam __state_%d_req = %d;\n", now_proc_tree->stage, count);
       verilog_state = register_verilog(verilog_state, buf);
@@ -1416,8 +1416,8 @@ int create_verilog_state()
 int create_verilog_label()
 {
   PARSER_TREE_IR *now_parser_tree_ir = parser_tree_ir_top;
-    char *buf;
-    char *str;
+  char *buf;
+  char *str;
   int count = 1;
 
   buf = calloc(STR_MAX, 1);
@@ -1425,7 +1425,7 @@ int create_verilog_label()
   sprintf(buf, "localparam __label_0 = 0;\n");
   verilog_state = register_verilog(verilog_state, buf);
 
-    while(now_parser_tree_ir != NULL){
+  while(now_parser_tree_ir != NULL){
     if(now_parser_tree_ir->flag == PARSER_IR_FLAG_LABEL){
       str = labelalloc(now_parser_tree_ir->label);
       sprintf(buf, "localparam %s = %d;\n", str, now_parser_tree_ir->stage);
@@ -1454,7 +1454,7 @@ int output_verilog_sdiv(FILE *fp)
   PARSER_TREE_IR *now_parser_tree_ir = parser_tree_ir_top;
   int is_sdiv = 0;
 
-    while(now_parser_tree_ir != NULL){
+  while(now_parser_tree_ir != NULL){
     if(now_parser_tree_ir->flag == PARSER_IR_FLAG_SCALL){
       is_sdiv = 1;
     }
@@ -1498,7 +1498,7 @@ int output_verilog_return(FILE *fp)
 
   int width;
 
-    while(now_parser_tree_ir != NULL){
+  while(now_parser_tree_ir != NULL){
     if(now_parser_tree_ir->flag == PARSER_IR_FLAG_RETURN){
       if(strcmp(now_parser_tree_ir->ret.type, "void")){
         width = get_width(now_parser_tree_ir->ret.type);
