@@ -15,7 +15,7 @@ void example01(char *led){
 	int i = 0;
 	int count = 0;
 	while(count < 10){
-		if( i == 5000000 ){
+		if( i == 100 ){
 			i = 0;
 			led[0] = ~led[0];
 			count++;
