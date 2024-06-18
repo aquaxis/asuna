@@ -531,7 +531,7 @@ int parser_ir_source(char *buf)
       }
     }while(strcmp(token,")") || level != 0);
   }else if(token[0] == '%'){
-    // レジスタ
+    // レジスタ代入
     strcpy(parser_tree_ir_current->label, token);
 
     get_token_llvm(line, token);
@@ -753,7 +753,11 @@ int parser_ir_source(char *buf)
       // タイプ
       get_irtype_llvm(line, token);
       strcpy(parser_tree_ir_current->load.type, token);
+      // ,
+      get_token_llvm(line, token);
       // ポインタ
+      get_irtype_llvm(line, token);
+      // レジスタ名
       get_irtype_llvm(line, token);
       strcpy(parser_tree_ir_current->load.name, token);
       // ,
@@ -1064,7 +1068,7 @@ int parser_ir_source(char *buf)
   free(token);
   free(line);
 
-    return 0;
+  return 0;
 }
 /*!
  * @brief  ラベル名からステージ番号を取得する

@@ -36,30 +36,30 @@ typedef struct top_signal_tree{
   struct top_signal_tree  *prev_ptr;
   struct top_signal_tree  *next_ptr;
 
-  char        *label;        // ラベル
-  int          size;
-  int          inout;        // 信号の方向、0:In、1:OUT
-  int          used;        // 信号が使用されたかどうか、0:未使用、1:使用済
-  char        *module_name;    // モジュール名
-  int          flag;        // フラグ
-  char        *name;        // 信号名
-  char        *call_name;
-  int          args_num;
-  char        *verilog_signal;
-  char        *verilog_wire;
+  char *label;          // ラベル
+  int   size;
+  int   inout;          // 信号の方向、0:In、1:OUT
+  int   used;           // 信号が使用されたかどうか、0:未使用、1:使用済
+  char *module_name;    // モジュール名
+  int   flag;           // フラグ
+  char *name;           // 信号名
+  char *call_name;
+  int   args_num;
+  char *verilog_signal;
+  char *verilog_wire;
 } TOP_SIGNAL_TREE;
 
 TOP_SIGNAL_TREE *top_signal_tree_top        = NULL;
 
-#define FLAG_NONE  0
-#define FLAG_CTRL  1
-#define FLAG_GMEM  2
-#define FLAG_ARGS  3
-#define FLAG_BASE  4
-#define FLAG_CALL  5
-#define FLAG_RETURN  6
+#define FLAG_NONE   0
+#define FLAG_CTRL   1
+#define FLAG_GMEM   2
+#define FLAG_ARGS   3
+#define FLAG_BASE   4
+#define FLAG_CALL   5
+#define FLAG_RETURN 6
 
-#define SIG_IN  0
+#define SIG_IN   0
 #define SIG_OUT  1
 
 int use_llvm_memcpy = 0;
@@ -67,7 +67,6 @@ int use_gm_if = 0;
 
 /*!
  * @brief  モジュール宣言の登録
- *
  */
 char *top_module_decl = NULL;
 int register_top_module_decl(char *line)
@@ -464,13 +463,17 @@ int create_top_wire(FILE *fp)
 /*!
  * @brief  未使用の信号宣言の生成
  */
-int create_top_nowire(FILE *fp)
+int create_top_nowire(FILE *fp, char *topname)
 {
   TOP_SIGNAL_TREE *now_top_signal_tree;
 
+  char *topmodule;
+  topmodule = malloc(strlen(topname)+1);
+  strncpy(topmodule, topname, strlen(topname)-4);
+
   now_top_signal_tree = top_signal_tree_top;
   while(now_top_signal_tree != NULL){
-    if(now_top_signal_tree->used == 0){
+    if((now_top_signal_tree->used == 0) && (!strcmp(now_top_signal_tree->module_name, topmodule))){
       if(now_top_signal_tree->flag == FLAG_ARGS){
         if(now_top_signal_tree->inout == SIG_IN){
           fprintf(fp, "\tinput ");
@@ -491,6 +494,8 @@ int create_top_nowire(FILE *fp)
     }
     now_top_signal_tree = now_top_signal_tree->next_ptr;
   }
+
+  free(topmodule);
 
   return 0;
 }
@@ -870,24 +875,63 @@ int output_top_module(FILE *fp, char *topname)
   // 外部信号を入れる
   fprintf(fp,"\t// global signal\n");
   create_top_global(fp);
-  create_top_nowire(fp);
+  create_top_nowire(fp, topname);
   fprintf(fp,");\n");
+  fprintf(fp,"\n");
 
   // Wire宣言を入れる
   fprintf(fp,"// wire\n");
   create_top_wire(fp);
+  fprintf(fp,"\n");
+
   fprintf(fp,"// connection\n");
   fprintf(fp,"%s", top_module_assign);
-  fprintf(fp,");\n");
 
   fprintf(fp,"// system signal\n");
   create_top_nofunc(fp);
-  fprintf(fp,");\n");
+  fprintf(fp,"\n");
 
   fprintf(fp,"// modules\n");
   fprintf(fp,"%s", top_module_decl);
 
   fprintf(fp,"endmodule\n");
+
+  return 0;
+}
+
+/*!
+ * @brief  ツリーの表示
+ *
+ */
+int print_top_signal_tree(FILE *fp)
+{
+  TOP_SIGNAL_TREE *now_top_signal_tree;
+
+  fprintf(fp,"==============================\n");
+  fprintf(fp,"Print - Top Signal Tree\n");
+  fprintf(fp,"==============================\n");
+  now_top_signal_tree = top_signal_tree_top;
+  while(1){
+    if(now_top_signal_tree == NULL) break;
+
+    fprintf(fp, "Label:          %s\n", now_top_signal_tree->label);
+    fprintf(fp, "Size:           %d\n", now_top_signal_tree->size);
+    fprintf(fp, "InOut:          %d\n", now_top_signal_tree->inout);
+    fprintf(fp, "Used:           %d\n", now_top_signal_tree->used);
+    fprintf(fp, "Module_Name:    %s\n", now_top_signal_tree->module_name);
+    fprintf(fp, "Flag:           %d\n", now_top_signal_tree->flag);
+    fprintf(fp, "Name:           %s\n", now_top_signal_tree->name);
+    fprintf(fp, "Call_Name:      %s\n", now_top_signal_tree->call_name);
+    fprintf(fp, "Args_Num:       %d\n", now_top_signal_tree->args_num);
+    fprintf(fp, "Verilog_Signal: %s\n", now_top_signal_tree->verilog_signal);
+    fprintf(fp, "Verilog_Wire:   %s\n", now_top_signal_tree->verilog_wire);
+
+    now_top_signal_tree = now_top_signal_tree->next_ptr;
+    fprintf(fp,"==============================\n");
+
+  }
+
+  fprintf(fp,"==============================\n");
 
   return 0;
 }

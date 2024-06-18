@@ -368,6 +368,7 @@ int parser_memory_tree()
                 !strcmp(token, "noundef") ||
                 !strcmp(token, "nest") ||
                 !strcmp(token, "readonly") ||
+                !strcmp(token, "writeonly") ||
                 !strcmp(token, "readnone") ||
                 !strcmp(token, "returned") ||
                 !strcmp(token, "dereferenceable") ||
@@ -664,18 +665,18 @@ int get_memory_size(char *label, char *ptr, char *rslt_ptr)
   char *str = NULL;
 
   now_memory_tree = memory_tree_top;
-    while(now_memory_tree != NULL){
-    if(!strcmp(now_memory_tree->label, label)) break;
-        now_memory_tree = now_memory_tree->next_ptr;
-    }
+  while(now_memory_tree != NULL){
+  if(!strcmp(now_memory_tree->label, label)) break;
+    now_memory_tree = now_memory_tree->next_ptr;
+  }
   if(now_memory_tree == NULL){
     printf("[ABORT] get_memory_size(): unknown memory = \"%s\"\n", label);
     exit(0);
   }
 
-  token    = calloc(STR_MAX,1);
-  temp    = calloc(STR_MAX,1);
-  buf      = calloc(strlen(now_memory_tree->type)+1,1);
+  token = calloc(STR_MAX,1);
+  temp  = calloc(STR_MAX,1);
+  buf   = calloc(strlen(now_memory_tree->type)+1,1);
   strcpy(buf, now_memory_tree->type);
 
   if(ptr != NULL){

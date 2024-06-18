@@ -302,6 +302,7 @@ int output_proc_tree(FILE *fp)
       fprintf(fp, "\t\t__state_%d_wait: begin\n", now_proc_tree->stage);
       fprintf(fp, "%s", now_proc_tree->seq_wait.state);
       if(now_proc_tree->seq_wait.body != NULL )    fprintf(fp, "%s", now_proc_tree->seq_wait.body);
+      fprintf(fp, "\t\t\tend\n"); // ちょっと強制的にendをつける
       fprintf(fp, "\t\tend\n");
     }
 
@@ -471,6 +472,7 @@ int create_verilog_call_args(char *name, char *args, char *buf, int is_call)
         !strcmp(token, "noundef") ||
         !strcmp(token, "nest") ||
         !strcmp(token, "readonly") ||
+        !strcmp(token, "writeonly") ||
         !strcmp(token, "readnone") ||
         !strcmp(token, "returned") ||
         !strcmp(token, "dereferenceable") ||
@@ -1330,7 +1332,8 @@ int create_verilog_proc_tree()
       }
 
       if(proc_tree_current->seq_wait.ena){
-        sprintf(buf, "\t\t\tif(%s) begin\n\t\t\t\t__state <= __state_%d_exec;\n\t\t\tend\n", proc_tree_current->seq_wait.condision, proc_tree_current->stage);
+//        sprintf(buf, "\t\t\tif(%s) begin\n\t\t\t\t__state <= __state_%d_exec;\n\t\t\tend\n", proc_tree_current->seq_wait.condision, proc_tree_current->stage);
+        sprintf(buf, "\t\t\tif(%s) begin\n\t\t\t\t__state <= __state_%d_exec;\n", proc_tree_current->seq_wait.condision, proc_tree_current->stage);
         proc_tree_current->seq_wait.state = charalloc(buf);
       }
 
@@ -1425,6 +1428,20 @@ int create_verilog_label()
   sprintf(buf, "localparam __label_0 = 0;\n");
   verilog_state = register_verilog(verilog_state, buf);
 
+  // 存在しない最初のラベルを作成する
+  while(now_parser_tree_ir != NULL){
+    if(now_parser_tree_ir->flag == PARSER_IR_FLAG_LABEL){
+      str = labelalloc(now_parser_tree_ir->label);
+      strncpy(str, str + strlen("__label_"), strlen(str));
+      sprintf(buf, "localparam __label_%d = %d;\n", atoi(str)-1, 0);
+      verilog_state = register_verilog(verilog_state, buf);
+      free(str);
+      break;
+    }
+    now_parser_tree_ir = now_parser_tree_ir->next_ptr;
+  }
+
+  // 通常のラベルを作成する
   while(now_parser_tree_ir != NULL){
     if(now_parser_tree_ir->flag == PARSER_IR_FLAG_LABEL){
       str = labelalloc(now_parser_tree_ir->label);
@@ -1433,7 +1450,7 @@ int create_verilog_label()
       free(str);
       count++;
     }
-        now_parser_tree_ir = now_parser_tree_ir->next_ptr;
+    now_parser_tree_ir = now_parser_tree_ir->next_ptr;
   }
 
   sprintf(buf, "integer __label_pre;\n");

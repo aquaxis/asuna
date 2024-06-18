@@ -126,9 +126,11 @@ int process_function(char *name)
   create_verilog_state();     // ステートマシン生成
   create_verilog_label();     // ラベルの生成
 
+#if 0
 #ifdef DEBUG
   print_array_type();             // メモリ一覧の表示
   print_call_tree(call_tree_top); // CALL命令の表示
+#endif
 #endif
 
 #if DEBUG
@@ -240,12 +242,22 @@ int process(char *csource)
   create_top_module();
   create_top_assign();
 
+#if DEBUG
+  sprintf(filename, "%s.log", topname);
+  if((fp = fopen(filename,"w")) == NULL){
+    printf("can't open file.\n");
+    exit(1);
+  }
+  print_top_signal_tree(fp);
+  fclose(fp);
+#endif
+
   sprintf(filename, "%s.v", topname);
   if((fp = fopen(filename,"w+")) == NULL){
     printf("can't open file.\n");
     exit(1);
   }
-  output_top_module(fp, topname);
+  output_top_module(fp, topname); // 最上位モジュールの出力
   fclose(fp);
 
   for(i = 0; i < function_count; i++){
