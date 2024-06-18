@@ -1,10 +1,14 @@
 # ASUNA(Algorithmic Synthesis for Unified Netlist Automation)
 
-ASUNA は C 言語から VerilogHDL を生成する高位合成ツールです。
+## LICENSE
 
-## ライセンス
+https://github.com/aquaxis/asuna/LICENSE
 
 * MIT を適用します
+
+## 概要
+
+ASUNA は C 言語から VerilogHDL を生成する高位合成ツールです。
 
 ## コンセプト
 
@@ -42,27 +46,71 @@ ASUNA は C 言語から VerilogHDL を生成する高位合成ツールです�
 
 # ビルド手順
 
-ASUNA は clang を使用するので事前に clang をインストールします。
+ASUNA は LLVM/clang を使用するので事前に LLVM/clang をインストールします。
+
+## LLVM のビルド
 
 ```
-$ sudo apt install clang
+$ LLVM_VERSION=llvmorg-18.1.7
+$ git clone https://github.com/llvm/llvm-project.git -b ${LLVM_VERSION}
+$ cd llvm-project
+$ mkdir build
+$ cd build/
+$ cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD="RISCV" -DCMAKE_INSTALL_PREFIX=${HOME}/${LLVM_VERSION} -G "Unix Makefiles" ../llvm
+$ make -j`nproc`
+$ make install
 ```
 
+## ASUNA のビルド
+
 ```
-$ ./asuna CSOURCE_FINELANE TOPMODULENAME
+$ git clone https://github.com/aquaxis/asuna.git
+$ cd asuna
+$ make asuna
+$ cp build/asuna ./
 ```
 
-TOPMODULENAME_top.v
-FUNCTION.v
-memory_map.txt
+# 使い方
 
-# 処理の流れ
+
+```
+$ ./asuna -f example.c
+```
+
+## 引数
+
+```
+$ asuna -f <FILENAME> [-d] [-h]
+```
+
+| 引数 | 概要 |
+|------|------|
+| -f   | 高位合成するファイル名を指定 |
+| -d   | デバッグモード               |
+| -h   | ヘルプの表示                 |
+
+## 生成ファイル
+
+FILENAME.c のファイルに対してつぎのファイルを生成します。
+
+* FILENAME_top.v
+* FUNCTION0.v
+* memory_map.txt
+
+FUNCTION.v は FILENAME.v の FILENAME 関数から辿れる関数名ごとにファイルが生成されます。
+
+## 制約
+
+* 最上位関数は FILENAME.c の FILENAME と同一にする必要がある
+
+
+## 処理の流れ
 
 1. 入力された C 言語のソースコードを関数単位に分離
 2. LLVM で LLVM-IR を出力
 3. LLVM-IR を VerilogHDL に変換
 
-# 将来の予定
+## 将来の予定
 
 * AXI バス
 * 浮動小数点処理
